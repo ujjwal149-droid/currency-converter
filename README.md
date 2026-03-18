@@ -41,7 +41,7 @@ A clean, real-time currency converter built with **React + Vite**. Fetches live 
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/ujjawal149-droid/currency-converter.git
+git clone https://github.com/ujjwal149-droid/currency-converter.git
 cd currency-converter
 
 # 2. Install dependencies
