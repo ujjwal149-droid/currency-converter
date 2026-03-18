@@ -112,7 +112,3 @@ Contributions are welcome! Feel free to open an issue or submit a pull request.
 5. Open a pull request
 
 ---
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
