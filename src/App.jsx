@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "./App.css";
 import CurrencyInput from "./components/CurrencyInput.jsx";
-import { useEffect } from "react";
 
 function App() {
   const [have, setHave] = useState("usd");
@@ -10,29 +9,32 @@ function App() {
   const [newAmount, setNewAmount] = useState(0);
   const [exchangeRate, setExchangeRate] = useState(0);
 
-  const convert = async () => {
-    let data;
+  const convert = useCallback(async () => {
     try {
       const response = await fetch(
-        `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${have}.json`,
+        `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${have}.json`
       );
-
       if (!response.ok) {
-        throw new Error(`Network response was not ok: ${response.status}`); //
+        throw new Error(`Network response was not ok: ${response.status}`);
       }
-
-      data = await response.json();
-      const requiredAmount = data[have][want] * amount;
-      setNewAmount(requiredAmount);
-      setExchangeRate(data[have][want]);
+      const data = await response.json();
+      const rate = data[have][want];
+      setExchangeRate(rate);
+      setNewAmount(parseFloat((rate * amount).toFixed(2)));
     } catch (err) {
       console.log(err);
     }
-  };
+  }, [amount, have, want]);
 
   useEffect(() => {
     convert();
-  }, [amount, have, want]);
+  }, [convert]);
+
+  // Swap the two currencies
+  const handleSwitch = () => {
+    setHave(want);
+    setWant(have);
+  };
 
   return (
     <div className="converter">
@@ -40,7 +42,7 @@ function App() {
       <header className="converter__header">
         <h1 className="converter__title">Currency Converter</h1>
         <p className="converter__subtitle">
-          Check live rates, set rate alerts, receive notifications and more.
+          Check live rates....
         </p>
       </header>
 
@@ -50,29 +52,31 @@ function App() {
           label={"Amount"}
           amount={amount}
           onChange={(e) => setAmount(Number(e.target.value))}
-          country={have.substring(0, 2)}
-          onCurrencyChange={(e) => setHave(String(e.target.name).toLocaleLowerCase())}
+          selectedCurrency={have}
+          onCurrencyChange={(e) => setHave(e.target.value)}
         />
 
         {/* Switch Button */}
         <div className="converter__switch">
-          <button className="switch-button">⇅</button>
+          <button className="switch-button" onClick={handleSwitch}>
+            ⇅
+          </button>
         </div>
 
         <CurrencyInput
           label={"Converted Amount"}
           amount={newAmount}
           onChange={(e) => setNewAmount(Number(e.target.value))}
-          country={want.substring(0,2)}
-          onCurrencyChange={(e) => setWant(String(e.target.name).toLocaleLowerCase())}
+          selectedCurrency={want}
+          onCurrencyChange={(e) => setWant(e.target.value)}
         />
       </div>
 
-      {/* Exchange Rate */}
       <footer className="converter__rate">
         <p>Indicative Exchange Rate</p>
         <strong>
-          1 {have} = {Number(exchangeRate).toFixed(2)} {want}
+          1 {have.toUpperCase()} = {Number(exchangeRate).toFixed(4)}{" "}
+          {want.toUpperCase()}
         </strong>
       </footer>
     </div>
